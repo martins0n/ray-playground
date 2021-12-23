@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  ray-head:
+    ports:
+      - "6379:6379"
+      - "8265:8265"
+      - "10001:10001"
+    build:
+      context: .
+      dockerfile: Dockerfile.ray
+    command: ["ray", "start", "--head", "--port=6379", "--address=0.0.0.0", "--dashboard-host=0.0.0.0", "--block"]
+  ray-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.ray
+    deploy:
+      replicas: 3
+    command: ["ray", "start", "--address=ray-head:6379", "--redis-password=5241590000000000", "--block"]
+    depends_on:
+      - ray-head
